@@ -3,7 +3,7 @@
  * Wrapper do Monaco Editor para edição de código Python
  * 
  * Design: Editor moderno com tema escuro, syntax highlighting para Python
- * Funcionalidade: Digitação em tempo real, validação de sintaxe
+ * Funcionalidade: Digitação em tempo real, validação de sintaxe, autocomplete
  */
 
 import Editor from '@monaco-editor/react';
@@ -14,6 +14,7 @@ interface CodeEditorProps {
   onChange: (code: string) => void;
   readOnly?: boolean;
   height?: string;
+  availableFunctions?: string[];
 }
 
 export default function CodeEditor({
@@ -21,6 +22,7 @@ export default function CodeEditor({
   onChange,
   readOnly = false,
   height = '400px',
+  availableFunctions = [],
 }: CodeEditorProps) {
   const editorRef = useRef(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
@@ -62,9 +64,62 @@ export default function CodeEditor({
           colors: {},
         });
       }
+
+      // Registrar completion provider para funções Python
+      if (monaco && monaco.languages) {
+        monaco.languages.registerCompletionItemProvider('python', {
+          provideCompletionItems: (model: any, position: any) => {
+            const word = model.getWordUntilPosition(position);
+            const range = {
+              startLineNumber: position.lineNumber,
+              endLineNumber: position.lineNumber,
+              startColumn: word.startColumn,
+              endColumn: word.endColumn,
+            };
+
+            // Criar completion items para funções disponíveis
+            const suggestions = availableFunctions.map((func) => {
+              const funcDescriptions: Record<string, string> = {
+                andar: 'Move o personagem para frente',
+                virar_direita: 'Vira 90° para a direita',
+                virar_esquerda: 'Vira 90° para a esquerda',
+                parede_na_frente: 'Retorna True se há parede na frente',
+                arvore_na_frente: 'Retorna True se há árvore na frente',
+                destino_na_frente: 'Retorna True se há destino na frente',
+                cor_do_bloco: 'Retorna a cor do bloco atual',
+                coletar: 'Coleta um item se houver',
+                parar: 'Para a execução',
+                mostrar: 'Exibe uma mensagem no console',
+                obstaculo_na_frente: 'Retorna True se há obstáculo na frente',
+                planta_madura_na_frente: 'Retorna True se há planta madura na frente',
+                solo_seco: 'Retorna True se o solo está seco',
+                tem_semente: 'Retorna True se há semente coletada',
+                clima_favoravel: 'Retorna True se o clima é favorável',
+                praga_detectada: 'Retorna True se há praga detectada',
+                regar: 'Rega o solo',
+                plantar: 'Planta uma semente',
+                remover_pedra: 'Remove um obstáculo',
+                aplicar_protecao: 'Aplica proteção contra pragas',
+              };
+
+              return {
+                label: func,
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: func + '()',
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                detail: funcDescriptions[func] || 'Função disponível',
+                documentation: funcDescriptions[func],
+                range: range,
+              };
+            });
+
+            return { suggestions };
+          },
+        });
+      }
     } catch (err) {
-      // Ignorar erros de tema
-      console.debug('Monaco theme configuration skipped');
+      // Ignorar erros de tema e completion
+      console.debug('Monaco configuration skipped');
     }
   };
 
@@ -103,6 +158,12 @@ export default function CodeEditor({
           selectionHighlight: false,
           renderLineHighlight: 'line',
           lineNumbersMinChars: 3,
+          suggestOnTriggerCharacters: true,
+          quickSuggestions: {
+            other: true,
+            comments: false,
+            strings: false,
+          },
         }}
       />
     </div>

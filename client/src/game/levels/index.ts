@@ -252,9 +252,9 @@ export const LEVEL_2_1: Level = {
   name: 'Pedra à Frente',
   description: 'Verificar se há obstáculo e reagir corretamente',
   concept: 'if',
-  objective: 'Se houver obstáculo na frente, vire à direita. Depois ande até o destino.',
-  context: 'Uma pedra pode bloquear a trilha da plantação.',
-  hint: 'Use if para decidir uma ação quando a condição for verdadeira.',
+  objective: 'Se houver parede na frente, vire à direita. Depois ande até o destino.',
+  context: 'Uma parede pode bloquear a trilha da plantação. Use if para verificar antes de andar.',
+  hint: 'Use parede_na_frente() para verificar se há obstáculo. Se houver, vire_direita().',
   gridWidth: 5,
   gridHeight: 4,
   grid: [
@@ -292,20 +292,19 @@ export const LEVEL_2_1: Level = {
   initialCode: `# Pedra à Frente
 # Verificar e reagir
 
-if obstaculo_na_frente():
-    virar_direita()
+if parede_na_frente():
+    # O que fazer se há parede?
+    
 
-andar()
-andar()
-andar()
-andar()`,
-  allowedFunctions: ['andar', 'virar_direita', 'obstaculo_na_frente', 'mostrar'],
+# Ande até o destino
+`,
+  allowedFunctions: ['andar', 'virar_direita', 'parede_na_frente'],
   winCondition: (state: GameState) => {
     const { character, currentLevel } = state;
     const destCell = currentLevel.grid[character.position.y]?.[character.position.x];
     return destCell?.type === CellType.DESTINATION;
   },
-  pedagogicalMessage: 'Ótimo! Você usou if para reagir ao ambiente!',
+  pedagogicalMessage: 'Perfeito! Você aprendeu a usar if para tomar decisões!',
 };
 
 /**

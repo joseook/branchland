@@ -288,7 +288,7 @@ export default function Game({ levelId = '1' }: GamePageProps) {
 
           {/* Coluna central: Editor e Controles */}
           <div className="lg:col-span-1 space-y-6">
-            <CodeEditor code={code} onChange={setCode} height="500px" />
+            <CodeEditor code={code} onChange={setCode} height="500px" availableFunctions={level.allowedFunctions} />
             <Controls
               onExecute={handleExecute}
               onReset={resetLevel}
