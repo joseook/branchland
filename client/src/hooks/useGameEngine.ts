@@ -34,6 +34,7 @@ export function useGameEngine(level: Level) {
     isWon: false,
     itemsCollected: 0,
     console: [],
+    executionLog: [],
   }));
 
   const actionQueueRef = useRef<Action[]>([]);
@@ -219,6 +220,7 @@ export function useGameEngine(level: Level) {
       isWon: false,
       itemsCollected: 0,
       console: [],
+      executionLog: [],
     });
   }, [level]);
 

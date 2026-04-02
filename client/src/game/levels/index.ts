@@ -1,6 +1,8 @@
 /**
  * Definição das fases do jogo Branchland
- * Cada fase ensina um conceito de estrutura de decisão em Python
+ * Estruturado em 5 mundos temáticos, cada um ensinando conceitos progressivos de Python
+ * 
+ * Identidade: Plataforma educacional de Python com ambientação de fazenda inteligente
  */
 
 import {
@@ -9,20 +11,188 @@ import {
   Direction,
   GameState,
   BlockColor,
+  WorldId,
 } from '@/game/types';
 
 /**
- * Fase 1: Primeira Decisão (if simples)
- * Conceito: if
- * Objetivo: Se houver árvore na frente, desviar; senão, andar até o destino
+ * MUNDO 1 — CAMPOS DE INÍCIO
+ * Propósito: Introduzir a linguagem do jogo e ações básicas
+ * Conceitos: execução simples, sequência, noção de função
  */
-export const LEVEL_1: Level = {
-  id: '1',
+
+/**
+ * Fase 1.1: Primeiros Passos
+ * Conceito: Sequência simples de ações
+ */
+export const LEVEL_1_1: Level = {
+  id: '1_1',
+  worldId: WorldId.WORLD_1,
+  name: 'Primeiros Passos',
+  description: 'Aprenda a se mover no mapa',
+  concept: 'Sequência de ações',
+  objective: 'Ande até o destino seguindo em frente.',
+  context: 'Você é um fazendeiro em uma fazenda inteligente. Seu primeiro desafio é aprender a se mover.',
+  hint: 'Use andar() para se mover para frente. Chame a função várias vezes para alcançar o destino.',
+  gridWidth: 6,
+  gridHeight: 5,
+  grid: [
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.DESTINATION },
+    ],
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+  ],
+  characterStartPosition: { x: 0, y: 2 },
+  characterStartDirection: Direction.RIGHT,
+  initialCode: `# Fase 1.1: Primeiros Passos
+# Ande até o destino
+
+andar()
+andar()
+andar()
+andar()
+andar()`,
+  allowedFunctions: ['andar', 'mostrar'],
+  winCondition: (state: GameState) => {
+    const { character, currentLevel } = state;
+    const destCell = currentLevel.grid[character.position.y]?.[character.position.x];
+    return destCell?.type === CellType.DESTINATION;
+  },
+  pedagogicalMessage: 'Ótimo! Você aprendeu a usar sequência de ações. Cada andar() move o personagem um passo.',
+};
+
+/**
+ * Fase 1.2: Virando
+ * Conceito: Mudança de direção
+ */
+export const LEVEL_1_2: Level = {
+  id: '1_2',
+  worldId: WorldId.WORLD_1,
+  name: 'Virando',
+  description: 'Aprenda a mudar de direção',
+  concept: 'Mudança de direção',
+  objective: 'Chegue ao destino virando quando necessário.',
+  context: 'O caminho não é sempre reto. Você precisa aprender a virar.',
+  hint: 'Use virar_direita() ou virar_esquerda() para mudar de direção. Depois use andar() para avançar.',
+  gridWidth: 6,
+  gridHeight: 5,
+  grid: [
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
+      { type: CellType.DESTINATION },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+  ],
+  characterStartPosition: { x: 5, y: 2 },
+  characterStartDirection: Direction.RIGHT,
+  initialCode: `# Fase 1.2: Virando
+# Ande para frente, depois vire e chegue ao destino
+
+andar()
+andar()
+virar_esquerda()
+andar()
+andar()
+andar()
+andar()
+andar()`,
+  allowedFunctions: ['andar', 'virar_direita', 'virar_esquerda', 'mostrar'],
+  winCondition: (state: GameState) => {
+    const { character, currentLevel } = state;
+    const destCell = currentLevel.grid[character.position.y]?.[character.position.x];
+    return destCell?.type === CellType.DESTINATION;
+  },
+  pedagogicalMessage: 'Excelente! Você dominou a mudança de direção. Agora pode navegar em qualquer direção.',
+};
+
+/**
+ * MUNDO 2 — DESVIOS E DECISÕES
+ * Propósito: Ensinar estrutura de decisão básica
+ * Conceitos: if, else, leitura de ambiente
+ */
+
+/**
+ * Fase 2.1: Primeira Decisão (if simples)
+ * Conceito: if
+ */
+export const LEVEL_2_1: Level = {
+  id: '2_1',
+  worldId: WorldId.WORLD_2,
   name: 'Primeira Decisão',
   description: 'Aprenda a usar if para tomar decisões simples',
   concept: 'if',
-  objective:
-    'Se houver uma árvore na frente, vire à direita. Caso contrário, ande até o destino.',
+  objective: 'Se houver uma árvore na frente, vire à direita. Caso contrário, ande até o destino.',
+  context: 'Há uma árvore no caminho da plantação. Seu código precisa decidir quando seguir e quando desviar.',
   hint: 'Use arvore_na_frente() para verificar se há árvore. Use if para decidir o que fazer.',
   gridWidth: 6,
   gridHeight: 5,
@@ -70,294 +240,46 @@ export const LEVEL_1: Level = {
   ],
   characterStartPosition: { x: 1, y: 2 },
   characterStartDirection: Direction.RIGHT,
-  initialCode: `# Fase 1: Use if para verificar se há árvore na frente
-# Se houver árvore, vire à direita
-# Caso contrário, ande até o destino
+  initialCode: `# Fase 2.1: Primeira Decisão
+# Use if para verificar se há árvore na frente
 
 if arvore_na_frente():
     virar_direita()
-else:
-    # Ande até o destino
-    for i in range(4):
-        andar()
-`,
+    andar()
+    virar_esquerda()
+
+andar()
+andar()
+andar()
+andar()`,
+  allowedFunctions: ['andar', 'virar_direita', 'virar_esquerda', 'arvore_na_frente', 'mostrar'],
   winCondition: (state: GameState) => {
-    const destCell = state.grid[state.character.position.y][
-      state.character.position.x
-    ];
-    return destCell.type === CellType.DESTINATION;
+    const { character, currentLevel } = state;
+    const destCell = currentLevel.grid[character.position.y]?.[character.position.x];
+    return destCell?.type === CellType.DESTINATION;
   },
+  pedagogicalMessage: 'Boa! Você usou uma condição para reagir ao ambiente. Isso é o coração da programação lógica.',
 };
 
 /**
- * Fase 2: Caminho Alternativo (if/else)
+ * Fase 2.2: Caminho Alternativo (if/else)
  * Conceito: if/else
- * Objetivo: Se houver obstáculo, virar; caso contrário, seguir
  */
-export const LEVEL_2: Level = {
-  id: '2',
+export const LEVEL_2_2: Level = {
+  id: '2_2',
+  worldId: WorldId.WORLD_2,
   name: 'Caminho Alternativo',
   description: 'Use if/else para escolher entre dois caminhos',
   concept: 'if/else',
-  objective:
-    'Se houver parede na frente, vire à esquerda e ande. Caso contrário, ande reto até o destino.',
-  hint: 'Use parede_na_frente() para verificar obstáculos. Use if/else para escolher a ação.',
-  gridWidth: 7,
-  gridHeight: 5,
-  grid: [
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.DESTINATION },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-  ],
-  characterStartPosition: { x: 0, y: 2 },
-  characterStartDirection: Direction.RIGHT,
-  initialCode: `# Fase 2: Use if/else para contornar obstáculos
-# Se há parede na frente, vire à esquerda
-# Caso contrário, ande
-
-for i in range(7):
-    if parede_na_frente():
-        virar_esquerda()
-        andar()
-        virar_direita()
-    else:
-        andar()
-`,
-  winCondition: (state: GameState) => {
-    const destCell = state.grid[state.character.position.y][
-      state.character.position.x
-    ];
-    return destCell.type === CellType.DESTINATION;
-  },
-};
-
-/**
- * Fase 3: Múltiplos Casos (elif)
- * Conceito: elif
- * Objetivo: Decidir ação baseada na cor do bloco
- */
-export const LEVEL_3: Level = {
-  id: '3',
-  name: 'Múltiplos Casos',
-  description: 'Use elif para lidar com múltiplas condições',
-  concept: 'elif',
-  objective:
-    'Siga as regras: verde = andar, amarelo = virar direita, vermelho = parar',
-  hint: 'Use cor_do_bloco() para obter a cor. Use if/elif/else para decidir a ação.',
-  gridWidth: 5,
-  gridHeight: 5,
-  grid: [
-    [
-      { type: CellType.COLORED_BLOCK, color: 'green' as BlockColor },
-      { type: CellType.COLORED_BLOCK, color: 'green' as BlockColor },
-      { type: CellType.COLORED_BLOCK, color: 'yellow' as BlockColor },
-      { type: CellType.COLORED_BLOCK, color: 'green' as BlockColor },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.COLORED_BLOCK, color: 'green' as BlockColor },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.COLORED_BLOCK, color: 'red' as BlockColor },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.DESTINATION },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-  ],
-  characterStartPosition: { x: 0, y: 0 },
-  characterStartDirection: Direction.RIGHT,
-  initialCode: `# Fase 3: Use elif para múltiplas condições
-# Verde = andar, Amarelo = virar direita, Vermelho = parar
-
-for i in range(10):
-    cor = cor_do_bloco()
-    
-    if cor == 'green':
-        andar()
-    elif cor == 'yellow':
-        virar_direita()
-        andar()
-    elif cor == 'red':
-        parar()
-`,
-  winCondition: (state: GameState) => {
-    const destCell = state.grid[state.character.position.y][
-      state.character.position.x
-    ];
-    return destCell.type === CellType.DESTINATION;
-  },
-};
-
-/**
- * Fase 4: Lógica Composta (and/or)
- * Conceito: and / or / not
- * Objetivo: Combinar múltiplas condições
- */
-export const LEVEL_4: Level = {
-  id: '4',
-  name: 'Lógica Composta',
-  description: 'Use and/or/not para combinar condições',
-  concept: 'and / or / not',
-  objective:
-    'Colete todos os itens sem bater em paredes. Use lógica composta para decidir.',
-  hint: 'Use parede_na_frente() e destino_na_frente() juntos com and/or.',
+  objective: 'Se houver parede na frente, vire à esquerda e ande. Caso contrário, ande reto até o destino.',
+  context: 'Há paredes no caminho. Seu código precisa decidir qual caminho seguir.',
+  hint: 'Use parede_na_frente() para verificar. Use else para definir o caminho alternativo.',
   gridWidth: 6,
-  gridHeight: 4,
-  grid: [
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.ITEM },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.ITEM },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.ITEM },
-      { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.ITEM },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.DESTINATION },
-    ],
-  ],
-  characterStartPosition: { x: 0, y: 0 },
-  characterStartDirection: Direction.RIGHT,
-  initialCode: `# Fase 4: Use and/or para lógica composta
-# Colete itens e chegue ao destino
-
-for i in range(20):
-    if not parede_na_frente():
-        andar()
-        coletar()
-    else:
-        virar_direita()
-`,
-  winCondition: (state: GameState) => {
-    const destCell = state.grid[state.character.position.y][
-      state.character.position.x
-    ];
-    return destCell.type === CellType.DESTINATION && state.itemsCollected >= 4;
-  },
-};
-
-/**
- * Fase 5: Reutilização com Função (def)
- * Conceito: def
- * Objetivo: Criar função auxiliar para decidir ação
- */
-export const LEVEL_5: Level = {
-  id: '5',
-  name: 'Reutilização com Função',
-  description: 'Use def para criar funções reutilizáveis',
-  concept: 'def',
-  objective: 'Crie uma função para contornar obstáculos e chegue ao destino',
-  hint: 'Use def para criar uma função que contorna obstáculos. Chame-a várias vezes.',
-  gridWidth: 8,
   gridHeight: 5,
   grid: [
     [
       { type: CellType.FLOOR },
       { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.WALL },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-    ],
-    [
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
-      { type: CellType.FLOOR },
       { type: CellType.FLOOR },
       { type: CellType.FLOOR },
       { type: CellType.FLOOR },
@@ -365,7 +287,13 @@ export const LEVEL_5: Level = {
     ],
     [
       { type: CellType.FLOOR },
+      { type: CellType.WALL },
+      { type: CellType.WALL },
       { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
       { type: CellType.FLOOR },
       { type: CellType.FLOOR },
       { type: CellType.FLOOR },
@@ -376,6 +304,12 @@ export const LEVEL_5: Level = {
     [
       { type: CellType.FLOOR },
       { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+      { type: CellType.FLOOR },
+    ],
+    [
       { type: CellType.FLOOR },
       { type: CellType.FLOOR },
       { type: CellType.FLOOR },
@@ -384,32 +318,49 @@ export const LEVEL_5: Level = {
       { type: CellType.FLOOR },
     ],
   ],
-  characterStartPosition: { x: 0, y: 2 },
+  characterStartPosition: { x: 1, y: 2 },
   characterStartDirection: Direction.RIGHT,
-  initialCode: `# Fase 5: Use def para criar funções reutilizáveis
-# Crie uma função para contornar obstáculos
+  initialCode: `# Fase 2.2: Caminho Alternativo
+# Use if/else para escolher o caminho
 
-def contornar():
-    if parede_na_frente():
-        virar_esquerda()
-        andar()
-        virar_direita()
-    else:
-        andar()
+if parede_na_frente():
+    virar_esquerda()
+    andar()
+    virar_direita()
+else:
+    andar()
 
-# Chame a função para chegar ao destino
-for i in range(8):
-    contornar()
-`,
+andar()
+andar()
+andar()
+andar()`,
+  allowedFunctions: ['andar', 'virar_direita', 'virar_esquerda', 'parede_na_frente', 'mostrar'],
   winCondition: (state: GameState) => {
-    const destCell = state.grid[state.character.position.y][
-      state.character.position.x
-    ];
-    return destCell.type === CellType.DESTINATION;
+    const { character, currentLevel } = state;
+    const destCell = currentLevel.grid[character.position.y]?.[character.position.x];
+    return destCell?.type === CellType.DESTINATION;
   },
+  pedagogicalMessage: 'Muito bem! Você combinou if e else para lidar com duas possibilidades.',
 };
 
 /**
- * Lista de todas as fases
+ * Exportar todas as fases
  */
-export const LEVELS: Level[] = [LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5];
+export const ALL_LEVELS: Level[] = [
+  LEVEL_1_1,
+  LEVEL_1_2,
+  LEVEL_2_1,
+  LEVEL_2_2,
+];
+
+/**
+ * Agrupar fases por mundo
+ */
+export const LEVELS_BY_WORLD = {
+  [WorldId.WORLD_1]: [LEVEL_1_1, LEVEL_1_2],
+  [WorldId.WORLD_2]: [LEVEL_2_1, LEVEL_2_2],
+  [WorldId.WORLD_3]: [],
+  [WorldId.WORLD_4]: [],
+  [WorldId.WORLD_5]: [],
+  [WorldId.WORLD_6]: [],
+};

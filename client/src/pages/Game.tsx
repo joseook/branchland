@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { usePyodide } from '@/hooks/usePyodide';
-import { LEVELS } from '@/game/levels';
+import { ALL_LEVELS } from '@/game/levels';
 import { PythonContext, ActionType } from '@/game/types';
 import { ChevronLeft } from 'lucide-react';
 
@@ -33,8 +33,7 @@ interface GamePageProps {
 
 export default function Game({ levelId = '1' }: GamePageProps) {
   const [, navigate] = useLocation();
-  const levelIndex = parseInt(levelId) - 1;
-  const level = LEVELS[levelIndex] || LEVELS[0];
+  const level = ALL_LEVELS.find(l => l.id === levelId) || ALL_LEVELS[0];
 
   const [code, setCode] = useState(level.initialCode);
   const [executionError, setExecutionError] = useState<string | null>(null);
@@ -115,6 +114,24 @@ export default function Game({ levelId = '1' }: GamePageProps) {
       mostrar: (msg: string) => {
         // Adicionar mensagem ao console (será feito via logs do Python)
       },
+      obstaculo_na_frente: () => {
+        const { character, grid } = gameState;
+        const nextPos = getNextPosition(character.position, character.direction);
+        if (nextPos.x < 0 || nextPos.x >= grid[0].length || nextPos.y < 0 || nextPos.y >= grid.length) {
+          return true;
+        }
+        const cell = grid[nextPos.y][nextPos.x];
+        return cell.type === 'OBSTACLE' || cell.type === 'WALL';
+      },
+      planta_madura_na_frente: () => false,
+      solo_seco: () => false,
+      tem_semente: () => gameState.itemsCollected > 0,
+      clima_favoravel: () => true,
+      praga_detectada: () => false,
+      plantar: () => queueAction(ActionType.PLANT),
+      regar: () => queueAction(ActionType.WATER),
+      remover_pedra: () => queueAction(ActionType.REMOVE_OBSTACLE),
+      aplicar_protecao: () => {},
     };
   }, [gameState, queueAction]);
 
@@ -155,9 +172,9 @@ export default function Game({ levelId = '1' }: GamePageProps) {
    * Ir para próxima fase
    */
   const handleNextLevel = useCallback(() => {
-    const nextLevelId = parseInt(levelId) + 1;
-    if (nextLevelId <= LEVELS.length) {
-      navigate(`/game/${nextLevelId}`);
+    const currentIndex = ALL_LEVELS.findIndex(l => l.id === levelId);
+    if (currentIndex >= 0 && currentIndex < ALL_LEVELS.length - 1) {
+      navigate(`/game/${ALL_LEVELS[currentIndex + 1].id}`);
     } else {
       navigate('/');
     }
@@ -201,7 +218,7 @@ export default function Game({ levelId = '1' }: GamePageProps) {
             <div>
               <h1 className="text-2xl font-bold">Branchland</h1>
               <p className="text-sm text-muted-foreground">
-                Fase {levelId} de {LEVELS.length}
+                {level.name} ({level.worldId})
               </p>
             </div>
           </div>
@@ -270,7 +287,7 @@ export default function Game({ levelId = '1' }: GamePageProps) {
               onNextLevel={handleNextLevel}
               isExecuting={gameState.isExecuting}
               isWon={gameState.isWon}
-              hasNextLevel={parseInt(levelId) < LEVELS.length}
+              hasNextLevel={ALL_LEVELS.findIndex(l => l.id === levelId) < ALL_LEVELS.length - 1}
             />
           </div>
 

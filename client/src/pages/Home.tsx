@@ -7,7 +7,8 @@
 
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
-import { LEVELS } from '@/game/levels';
+import { ALL_LEVELS } from '@/game/levels';
+import type { Level } from '@/game/types';
 import { ArrowRight, BookOpen, Zap } from 'lucide-react';
 
 export default function Home() {
@@ -86,7 +87,7 @@ export default function Home() {
           <h2 className="text-2xl font-bold text-white">Fases Disponíveis</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {LEVELS.map((level) => (
+            {ALL_LEVELS.map((level: Level) => (
               <div
                 key={level.id}
                 className="bg-slate-800 border border-slate-700 rounded-lg p-6 hover:border-slate-600 transition-all hover:shadow-lg hover:shadow-blue-500/10"
@@ -96,7 +97,7 @@ export default function Home() {
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="text-lg font-bold text-white">{level.name}</h3>
                     <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
-                      Fase {level.id}
+                      {level.worldId.toUpperCase()}
                     </span>
                   </div>
                   <p className="text-slate-400 text-sm">{level.description}</p>
@@ -111,9 +112,8 @@ export default function Home() {
                 </div>
 
                 {/* Objetivo */}
-                <p className="text-sm text-slate-300 mb-4">{level.objective}</p>
-
-                {/* Botão */}
+                <p className="text-sm text-slate-400 mb-4">{level.description}</p>
+                <p className="text-xs text-slate-500 mb-3"><strong>Conceito:</strong> {level.concept}</p>                {/* Botão */}
                 <Button
                   onClick={() => handleStartLevel(level.id)}
                   className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
