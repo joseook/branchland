@@ -7,7 +7,7 @@
  */
 
 import Editor from '@monaco-editor/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 interface CodeEditorProps {
   code: string;
@@ -23,6 +23,7 @@ export default function CodeEditor({
   height = '400px',
 }: CodeEditorProps) {
   const editorRef = useRef(null);
+  const [isEditorReady, setIsEditorReady] = useState(false);
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
@@ -32,21 +33,43 @@ export default function CodeEditor({
 
   const handleEditorMount = (editor: any) => {
     editorRef.current = editor;
-    // Configurar atalhos customizados se necessário
-    editor.addCommand(
-      // Ctrl+Enter para executar (será capturado pelo componente pai)
-      2048 + 13, // Ctrl+Enter
-      () => {
-        // Disparar evento customizado
-        window.dispatchEvent(new CustomEvent('executeCode'));
-      }
-    );
+    setIsEditorReady(true);
+    
+    try {
+      // Configurar atalhos customizados se necessário
+      editor.addCommand(
+        // Ctrl+Enter para executar (será capturado pelo componente pai)
+        2048 + 13, // Ctrl+Enter
+        () => {
+          // Disparar evento customizado
+          window.dispatchEvent(new CustomEvent('executeCode'));
+        }
+      );
+    } catch (err) {
+      console.warn('Erro ao configurar atalhos do Monaco:', err);
+    }
+  };
+
+  const handleEditorWillMount = (monaco: any) => {
+    // Configurar Monaco antes de montar
+    try {
+      // Desabilitar carregamento de dependências problemáticas
+      monaco.editor.defineTheme('custom-dark', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [],
+        colors: {},
+      });
+    } catch (err) {
+      console.warn('Erro ao configurar tema do Monaco:', err);
+    }
   };
 
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-card">
-      <div className="bg-secondary px-4 py-2 border-b border-border">
+      <div className="bg-secondary px-4 py-2 border-b border-border flex justify-between items-center">
         <h3 className="text-sm font-semibold text-foreground">Código Python</h3>
+        {!isEditorReady && <span className="text-xs text-muted-foreground animate-pulse">Carregando...</span>}
       </div>
       <Editor
         height={height}
@@ -54,7 +77,9 @@ export default function CodeEditor({
         value={code}
         onChange={handleEditorChange}
         onMount={handleEditorMount}
+        beforeMount={handleEditorWillMount}
         theme="vs-dark"
+        loading={<div className="p-4 text-foreground text-sm">Carregando editor...</div>}
         options={{
           minimap: { enabled: false },
           fontSize: 14,
@@ -62,14 +87,19 @@ export default function CodeEditor({
           readOnly: readOnly,
           scrollBeyondLastLine: false,
           wordWrap: 'on',
-          formatOnPaste: true,
-          formatOnType: true,
           tabSize: 2,
           insertSpaces: true,
           autoIndent: 'full',
           bracketPairColorization: {
-            enabled: true,
+            enabled: false,
           },
+          automaticLayout: true,
+          contextmenu: true,
+          smoothScrolling: true,
+          occurrencesHighlight: 'off',
+          selectionHighlight: false,
+          renderLineHighlight: 'line',
+          lineNumbersMinChars: 3,
         }}
       />
     </div>
