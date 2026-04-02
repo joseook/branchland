@@ -26,6 +26,7 @@ import { usePyodide } from '@/hooks/usePyodide';
 import { ALL_LEVELS } from '@/game/levels';
 import { PythonContext, ActionType } from '@/game/types';
 import { ChevronLeft } from 'lucide-react';
+import { getStarterCode } from '@/game/starterCode';
 
 interface GamePageProps {
   levelId?: string;
@@ -34,17 +35,16 @@ interface GamePageProps {
 export default function Game({ levelId = '1' }: GamePageProps) {
   const [, navigate] = useLocation();
   const level = ALL_LEVELS.find(l => l.id === levelId) || ALL_LEVELS[0];
-
-  const [code, setCode] = useState(level.initialCode);
+  const [code, setCode] = useState(getStarterCode(level));
   const [executionError, setExecutionError] = useState<string | null>(null);
 
   // Sincronizar codigo e erro quando a fase muda
   useEffect(() => {
-    setCode(level.initialCode);
+    setCode(getStarterCode(level));
     setExecutionError(null);
   }, [levelId]);
 
-  const { gameState, queueAction, processActionQueue, resetLevel, clearConsole } =
+  const { gameState, queueAction, processActionQueue, resetLevel, clearConsole, appendConsole } =
     useGameEngine(level);
 
   // Resetar o jogo quando a fase muda
@@ -123,7 +123,7 @@ export default function Game({ levelId = '1' }: GamePageProps) {
       coletar: () => queueAction(ActionType.COLLECT),
       parar: () => queueAction(ActionType.STOP),
       mostrar: (msg: string) => {
-        // Adicionar mensagem ao console (será feito via logs do Python)
+        appendConsole(String(msg));
       },
       obstaculo_na_frente: () => {
         const { character, grid } = gameState;
@@ -144,7 +144,7 @@ export default function Game({ levelId = '1' }: GamePageProps) {
       remover_pedra: () => queueAction(ActionType.REMOVE_OBSTACLE),
       aplicar_protecao: () => {},
     };
-  }, [gameState, queueAction]);
+  }, [appendConsole, gameState, queueAction]);
 
   /**
    * Executar código do usuário
@@ -173,7 +173,7 @@ export default function Game({ levelId = '1' }: GamePageProps) {
    * Restaurar código inicial
    */
   const handleRestoreCode = useCallback(() => {
-    setCode(level.initialCode);
+    setCode(getStarterCode(level));
   }, [level]);
 
   /**
@@ -278,7 +278,12 @@ export default function Game({ levelId = '1' }: GamePageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Coluna esquerda: Mapa e Console */}
           <div className="lg:col-span-1 space-y-6">
-            <GameBoard grid={gameState.grid} character={gameState.character} />
+            <GameBoard
+              grid={gameState.grid}
+              character={gameState.character}
+              trail={gameState.trail}
+              isExecuting={gameState.isExecuting}
+            />
             <ConsolePanel
               logs={gameState.console}
               error={executionError || undefined}

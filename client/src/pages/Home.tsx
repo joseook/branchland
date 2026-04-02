@@ -58,7 +58,7 @@ export default function Home() {
   const firstLevel = ALL_LEVELS[0];
 
   const enterGame = () => {
-    navigate(`/game/${firstLevel.id}`);
+    navigate('/jogo');
   };
 
   return (
@@ -375,11 +375,11 @@ export default function Home() {
                 navegação para o jogo
               </p>
               <h2 className="font-display mt-4 text-3xl font-semibold text-stone-950">
-                Entre na área do jogo e comece pela primeira fase.
+                Entre na área do jogo e leia a apresentação antes da primeira fase.
               </h2>
               <p className="mt-4 text-sm leading-7 text-stone-600">
-                A porta de entrada foi simplificada para que o usuário vá direto para a experiência
-                prática. A trilha começa na primeira fase do mundo inicial.
+                A porta de entrada agora explica melhor o objetivo do jogo, a progressão dos
+                mundos e o ritmo pedagógico antes de liberar a experiência prática.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Button
@@ -387,7 +387,7 @@ export default function Home() {
                   size="lg"
                   className="h-12 rounded-full bg-stone-950 px-6 text-white hover:bg-stone-800"
                 >
-                  Iniciar fase 1
+                  Ver apresentação
                   <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Button

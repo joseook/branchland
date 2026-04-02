@@ -173,6 +173,7 @@ export interface GameState {
   currentLevel: Level;
   character: Character;
   grid: Cell[][];
+  trail: Position[];
   actionQueue: Action[];
   isExecuting: boolean;
   isWon: boolean;

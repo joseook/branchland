@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import GameIntro from "./pages/GameIntro";
 import Home from "./pages/Home";
 import Game from "./pages/Game";
 
@@ -12,6 +13,7 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/jogo"} component={GameIntro} />
       <Route path={"/game/:levelId"} component={(props: any) => <Game levelId={props.params.levelId} />} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

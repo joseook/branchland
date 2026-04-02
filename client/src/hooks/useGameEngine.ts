@@ -29,6 +29,7 @@ export function useGameEngine(level: Level) {
       direction: level.characterStartDirection,
     },
     grid: level.grid.map(row => [...row]),
+    trail: [{ ...level.characterStartPosition }],
     actionQueue: [],
     isExecuting: false,
     isWon: false,
@@ -69,24 +70,37 @@ export function useGameEngine(level: Level) {
 
     for (const action of queue) {
       // Pequeno delay para visualizar animacao
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 360));
 
+      let nextState = currentState;
       switch (action.type) {
         case ActionType.MOVE:
-          currentState = executeMove(currentState);
+          nextState = executeMove(currentState);
           break;
         case ActionType.TURN_RIGHT:
-          currentState = executeTurnRight(currentState);
+          nextState = executeTurnRight(currentState);
           break;
         case ActionType.TURN_LEFT:
-          currentState = executeTurnLeft(currentState);
+          nextState = executeTurnLeft(currentState);
           break;
         case ActionType.COLLECT:
-          currentState = executeCollect(currentState);
+          nextState = executeCollect(currentState);
           break;
         case ActionType.STOP:
+          nextState = {
+            ...currentState,
+            console: [...currentState.console, 'Execução interrompida'],
+          };
           break;
       }
+
+      currentState = nextState;
+      gameStateRef.current = nextState;
+      setGameState(prev => ({
+        ...prev,
+        ...nextState,
+        isExecuting: true,
+      }));
     }
 
     // Verificar vitoria usando o estado final
@@ -136,6 +150,7 @@ export function useGameEngine(level: Level) {
         ...character,
         position: newPosition,
       },
+      trail: [...state.trail, { ...character.position }].slice(-16),
       console: [...state.console, `Andei para (${newPosition.x}, ${newPosition.y})`],
     };
   };
@@ -222,6 +237,7 @@ export function useGameEngine(level: Level) {
         direction: level.characterStartDirection,
       },
       grid: level.grid.map(row => [...row]),
+      trail: [{ ...level.characterStartPosition }],
       actionQueue: [],
       isExecuting: false,
       isWon: false,
@@ -238,12 +254,27 @@ export function useGameEngine(level: Level) {
     setGameState(prev => ({ ...prev, console: [] }));
   }, []);
 
+  /**
+   * Adiciona uma mensagem ao console
+   */
+  const appendConsole = useCallback((message: string) => {
+    setGameState(prev => ({
+      ...prev,
+      console: [...prev.console, message],
+    }));
+    gameStateRef.current = {
+      ...gameStateRef.current,
+      console: [...gameStateRef.current.console, message],
+    };
+  }, []);
+
   return {
     gameState,
     queueAction,
     processActionQueue,
     resetLevel,
     clearConsole,
+    appendConsole,
   };
 }
 

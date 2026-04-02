@@ -30,11 +30,11 @@ export default function MissionPanel({ level }: MissionPanelProps) {
         </div>
 
         {/* Conceito */}
-        <div className="bg-accent/20 border border-accent/50 rounded p-3">
-          <p className="text-xs font-semibold text-accent-foreground uppercase mb-1">
+        <div className="rounded border border-amber-200 bg-amber-50/80 p-3">
+          <p className="mb-1 text-xs font-semibold uppercase text-amber-900">
             Conceito
           </p>
-          <p className="text-sm text-foreground font-mono bg-slate-900 p-2 rounded">
+          <p className="rounded bg-white/90 p-2 font-mono text-sm text-stone-700 shadow-sm">
             {level.concept}
           </p>
         </div>
