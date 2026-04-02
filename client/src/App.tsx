@@ -11,7 +11,7 @@ import Game from "./pages/Game";
 function Router() {
   return (
     <Switch>
-      <Route path={"\\"} component={Home} />
+      <Route path={"/"} component={Home} />
       <Route path={"/game/:levelId"} component={(props: any) => <Game levelId={props.params.levelId} />} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
