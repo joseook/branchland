@@ -9,7 +9,7 @@
  * - Resetar fase
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   GameState,
   Level,
@@ -38,6 +38,12 @@ export function useGameEngine(level: Level) {
   }));
 
   const actionQueueRef = useRef<Action[]>([]);
+  const gameStateRef = useRef<GameState>(gameState);
+
+  // Manter gameStateRef sincronizado com gameState
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   /**
    * Adiciona uma ação à fila
@@ -50,7 +56,7 @@ export function useGameEngine(level: Level) {
   }, []);
 
   /**
-   * Processa a fila de ações
+   * Processa a fila de acoes
    */
   const processActionQueue = useCallback(async () => {
     setGameState(prev => ({ ...prev, isExecuting: true }));
@@ -58,10 +64,11 @@ export function useGameEngine(level: Level) {
     const queue = [...actionQueueRef.current];
     actionQueueRef.current = [];
 
-    let currentState = gameState;
+    // Usar gameStateRef.current para evitar closure stale
+    let currentState = { ...gameStateRef.current };
 
     for (const action of queue) {
-      // Pequeno delay para visualizar animação
+      // Pequeno delay para visualizar animacao
       await new Promise(resolve => setTimeout(resolve, 300));
 
       switch (action.type) {
@@ -82,7 +89,7 @@ export function useGameEngine(level: Level) {
       }
     }
 
-    // Verificar vitória
+    // Verificar vitoria usando o estado final
     const isWon = level.winCondition(currentState);
 
     setGameState(prev => ({
@@ -91,7 +98,7 @@ export function useGameEngine(level: Level) {
       isExecuting: false,
       isWon,
     }));
-  }, [gameState, level]);
+  }, [level]);
 
   /**
    * Executa movimento para frente

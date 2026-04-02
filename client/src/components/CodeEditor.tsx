@@ -54,14 +54,17 @@ export default function CodeEditor({
     // Configurar Monaco antes de montar
     try {
       // Desabilitar carregamento de dependências problemáticas
-      monaco.editor.defineTheme('custom-dark', {
-        base: 'vs-dark',
-        inherit: true,
-        rules: [],
-        colors: {},
-      });
+      if (monaco && monaco.editor) {
+        monaco.editor.defineTheme('custom-dark', {
+          base: 'vs-dark',
+          inherit: true,
+          rules: [],
+          colors: {},
+        });
+      }
     } catch (err) {
-      console.warn('Erro ao configurar tema do Monaco:', err);
+      // Ignorar erros de tema
+      console.debug('Monaco theme configuration skipped');
     }
   };
 

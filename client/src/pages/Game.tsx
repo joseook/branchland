@@ -38,8 +38,19 @@ export default function Game({ levelId = '1' }: GamePageProps) {
   const [code, setCode] = useState(level.initialCode);
   const [executionError, setExecutionError] = useState<string | null>(null);
 
+  // Sincronizar codigo e erro quando a fase muda
+  useEffect(() => {
+    setCode(level.initialCode);
+    setExecutionError(null);
+  }, [levelId]);
+
   const { gameState, queueAction, processActionQueue, resetLevel, clearConsole } =
     useGameEngine(level);
+
+  // Resetar o jogo quando a fase muda
+  useEffect(() => {
+    resetLevel();
+  }, [levelId, resetLevel]);
   const { isReady: pyodideReady, isLoading: pyodideLoading, error: pyodideError, executePython } =
     usePyodide();
 
@@ -150,11 +161,8 @@ export default function Game({ levelId = '1' }: GamePageProps) {
       const context = createPythonContext();
       const logs = await executePython(code, context);
 
-      // Processar fila de ações
+      // Processar fila de acoes
       await processActionQueue();
-
-      // Adicionar logs ao console
-      gameState.console.push(...logs);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       setExecutionError(errorMsg);
@@ -169,12 +177,13 @@ export default function Game({ levelId = '1' }: GamePageProps) {
   }, [level]);
 
   /**
-   * Ir para próxima fase
+   * Ir para proxima fase
    */
   const handleNextLevel = useCallback(() => {
     const currentIndex = ALL_LEVELS.findIndex(l => l.id === levelId);
     if (currentIndex >= 0 && currentIndex < ALL_LEVELS.length - 1) {
-      navigate(`/game/${ALL_LEVELS[currentIndex + 1].id}`);
+      const nextLevelId = ALL_LEVELS[currentIndex + 1].id;
+      navigate(`/game/${nextLevelId}`);
     } else {
       navigate('/');
     }
